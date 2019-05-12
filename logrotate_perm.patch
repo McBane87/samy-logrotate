@@ -1,0 +1,55 @@
+--- logrotate/config.c	2019-04-21 14:24:04.250031235 +0200
++++ logrotate/config.c	2019-04-20 22:02:36.852552833 +0200
+@@ -247,12 +247,10 @@
+ static int resolveUid(const char *userName, uid_t *pUid)
+ {
+     struct passwd *pw;
+-#ifdef __CYGWIN__
+     if (strcmp(userName, "root") == 0) {
+         *pUid = 0;
+         return 0;
+     }
+-#endif
+     pw = getpwnam(userName);
+     if (!pw)
+         return -1;
+@@ -265,12 +263,10 @@
+ static int resolveGid(const char *groupName, gid_t *pGid)
+ {
+     struct group *gr;
+-#ifdef __CYGWIN__
+     if (strcmp(groupName, "root") == 0) {
+         *pGid = 0;
+         return 0;
+     }
+-#endif
+     gr = getgrnam(groupName);
+     if (!gr)
+         return -1;
+--- logrotate/logrotate.c	2019-04-21 14:24:04.254031354 +0200
++++ logrotate/logrotate.c	2019-04-20 22:10:34.182783724 +0200
+@@ -1185,15 +1185,15 @@
+             return 0;
+         }
+         /* Don't rotate in directories writable by others or group which is not "root"  */
+-        if ((sb.st_gid != 0 && sb.st_mode & S_IWGRP) || sb.st_mode & S_IWOTH) {
+-            message(MESS_ERROR, "skipping \"%s\" because parent directory has insecure permissions"
+-                    " (It's world writable or writable by group which is not \"root\")"
+-                    " Set \"su\" directive in config file to tell logrotate which user/group"
+-                    " should be used for rotation.\n"
+-                    ,log->files[logNum]);
+-            free(logpath);
+-            return 1;
+-        }
++//        if ((sb.st_gid != 0 && sb.st_mode & S_IWGRP) || sb.st_mode & S_IWOTH) {
++//            message(MESS_ERROR, "skipping \"%s\" because parent directory has insecure permissions"
++//                    " (It's world writable or writable by group which is not \"root\")"
++//                    " Set \"su\" directive in config file to tell logrotate which user/group"
++//                    " should be used for rotation.\n"
++//                    ,log->files[logNum]);
++//            free(logpath);
++//            return 1;
++//        }
+         free(logpath);
+     }
+ 

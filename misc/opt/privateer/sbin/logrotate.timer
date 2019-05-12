@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+(
+
+echo "START LOGROTATE TIMER"
+
+. /dtv/SGO.env
+
+PROG=$DISTROOT/sbin/logrotate
+CONF=$SYSROOT/etc/logrotate.conf
+
+while [ 1 == 1 ]; do
+	UPTIME=`cat /proc/uptime | sed 's/\..*$//g'`
+	MODULO=`expr $UPTIME % 21600`
+	if [ $MODULO -le 600 ]; then
+		$PROG $CONF
+		sleep 650
+	else
+		sleep 600
+	fi
+done
+
+) 2>&1 | tee -a "$TMPDIR/logrotate.log"

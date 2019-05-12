@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+(
+
+. /dtv/SGO.env
+
+PROG=$DISTROOT/sbin/logrotate
+CRON=$DISTROOT/sbin/logrotate.timer
+CONF=$SYSROOT/etc/logrotate.conf
+PID=$TMPDIR/logrotate.pid
+
+case $1 in
+        start)
+        echo "START LOGROTATE DAEMON"
+        $PROG $CONF
+        nohup $CRON >/dev/null 2>&1 &
+        echo $! > $PID
+        ;;
+        stop)
+        echo "STOP LOGROTATE DAEMON"
+        if [ -f "$PID" ]; then
+        	echo "STOP LOGROTATE TIMER"
+        	pkill -P `cat $PID` 2>/dev/null
+        	sleep 2
+        	pkill -9 -P `cat $PID` 2>/dev/null
+        	rm -f $PID
+        fi
+        ;;
+        *)
+        echo "Usage: $0 {start|stop}" 1>&2
+        exit 0
+        ;;
+esac
+
+) 2>&1 | tee -a "$TMPDIR/logrotate.log"
